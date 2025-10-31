@@ -6,7 +6,7 @@ Yildizi, T., Jia, T., Langeveld, J., & Taormina, R. (2026). Self-Supervised Lear
 ```
 This study explored the use of self-supervised learning for multi-label sewer defect classification. We proposed a semi-supervised framework that combines domain-specific pre-training on unlabelled CCTV footage with supervised fine-tuning on a limited labelled subset. This approach aims to reduce the dependence on extensive manual annotation while maintaining competitive performance across 17 sewer defect classes.
 
-![summary_figure](\SSL_illustrate.jpg)
+![figures](\SSL_illustrate.jpg)
 
 Acknowledgement:
 
