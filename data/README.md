@@ -47,7 +47,7 @@ For evaluation, we use the original validation set from the Sewer-ML dataset to 
 
 ## Accessing the Data
 
-1. First, obtain access to the Sewer-ML dataset through [link to Sewer-ML paper/repository]
+1. First, obtain access to the Sewer-ML dataset through [[link to Sewer-ML paper/repository](https://vap.aau.dk/sewer-ml/)]
 2. Clone this repository to get the image filenames and annotations
 3. Use the provided txt files to locate the corresponding images in your Sewer-ML dataset
 
