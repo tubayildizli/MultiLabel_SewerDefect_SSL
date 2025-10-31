@@ -1,0 +1,230 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+
+# -------------------------------------------------------------------------------------
+# Environments to run the jobs in
+# -------------------------------------------------------------------------------------
+
+cpu: &cpu
+  docker:
+    - image: circleci/python:3.8
+  resource_class: medium
+  parallelism: 10  # Number of parallel executors
+
+gpu: &gpu
+  environment:
+    CUDA_VERSION: "11.1"
+    CUDA_HOME: /usr/local/cuda-11.1
+    TERM: xterm
+  machine:
+    image: ubuntu-1604-cuda-11.1:202012-01
+  resource_class: gpu.nvidia.medium.multi  # Tesla T4
+
+# -------------------------------------------------------------------------------------
+# Re-usable commands
+# -------------------------------------------------------------------------------------
+
+install_python: &install_python
+  - run:
+      name: Install Python
+      working_directory: ~/
+      command: |
+        pyenv versions
+        pyenv install -f 3.7.0
+        pyenv global 3.7.0
+
+install_fairscale: &install_fairscale
+  - run:
+      name: Install Fairscale
+      working_directory: ~/
+      command: |
+        pip uninstall -y fairscale
+        pip install fairscale==0.4.6
+
+install_classy_vision: &install_classy_vision
+  - run:
+      name: Install ClassyVision
+      working_directory: ~/
+      command: |
+        pip uninstall -y classy_vision
+        pip install classy-vision@https://github.com/facebookresearch/ClassyVision/tarball/4785d5ee19d3bcedd5b28c1eb51ea1f59188b54d
+
+
+setup_venv: &setup_venv
+  - run:
+      name: Setup Virtual Environment
+      command: |
+        python -m venv ~/vissl_venv
+        echo ". ~/vissl_venv/bin/activate" >> $BASH_ENV
+        . ~/vissl_venv/bin/activate
+        python --version
+        which python
+        which pip
+        pip --version
+        pip install --upgrade pip
+        which python
+        which pip
+        pip --version
+        pip install -U setuptools
+
+pip_list: &pip_list
+  - run:
+      name: Pip list
+      command: |
+        pip list
+
+install_vissl_dep: &install_vissl_dep
+  - run:
+      name: Install VISSL Dependencies
+      working_directory: ~/vissl
+      command: |
+        pip install --progress-bar off torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+        pip install --progress-bar off opencv-python==4.5.1.48
+        pip install --progress-bar off -r requirements.txt
+        # Update this since classy_vision seems to need it.
+        pip install --progress-bar off --upgrade iopath
+
+# Must install python3-magic as per documentation:
+# https://github.com/facebookresearch/AugLy#installation
+install_augly: &install_augly
+  - run:
+      name: Install augly
+      working_directory: ~/vissl
+      command: |
+        pip install augly
+        sudo apt-get update
+        sudo apt-get install python3-magic
+
+install_apex_cpu: &install_apex_cpu
+  - run:
+      name: Install Apex for CPU
+      working_directory: ~/vissl
+      environment:
+        # Variable used by pip install of apex
+        TORCH_CUDA_ARCH_LIST: "5.0;5.2;5.3"
+      command: |
+        pip install -v --disable-pip-version-check --no-cache-dir apex@https://github.com/NVIDIA/apex/tarball/9ce0a10fb6c2537ef6a59f27b7875e32a9e9b8b8
+
+install_apex_gpu: &install_apex_gpu
+  - run:
+      name: Install Apex
+      working_directory: ~/vissl
+      environment:
+        # Both variables are used by install_apex.sh
+        CUDA_VER: "11.1"
+        TORCH_CUDA_ARCH_LIST: "5.0;5.2;5.3"
+      command: |
+        bash ./docker/common/install_apex.sh
+
+install_vissl: &install_vissl
+  - run:
+      name: Install VISSL
+      command: |
+        pip install -U --progress-bar off -e .[dev]
+
+run_unittests: &run_unittests
+  - run:
+      name: Run CPU Unit Tests
+      command: |
+        python -m unittest discover -v -s tests
+
+# -------------------------------------------------------------------------------------
+# Jobs to run (cpu and gpu)
+# -------------------------------------------------------------------------------------
+jobs:
+  cpu_tests:
+    <<: *cpu
+
+    working_directory: ~/vissl
+
+    steps:
+      - checkout
+      - <<: *setup_venv
+
+      # Cache the vissl_venv directory that contains dependencies
+      - restore_cache:
+          keys:
+            - v9-cpu-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
+
+      - <<: *install_vissl_dep
+      - <<: *install_augly
+      - <<: *install_classy_vision
+      - <<: *install_fairscale
+      - <<: *install_apex_cpu
+      - <<: *pip_list
+
+      - save_cache:
+          paths:
+            - ~/vissl_venv
+          key: v9-cpu-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
+
+      - <<: *install_vissl
+
+      - run:
+          name: isort
+          command: |
+            isort --sp . .
+      - run:
+          name: black
+          command: |
+            black .
+      - run:
+          name: flake8
+          command: |
+            flake8 --max-line-length 88 --ignore E501,E203,E266,W503,E741 .
+
+      - <<: *run_unittests
+
+  gpu_tests:
+    <<: *gpu
+
+    working_directory: ~/vissl
+
+    steps:
+      - checkout
+      - <<: *install_python
+      - <<: *setup_venv
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v9-gpu-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}-{{ checksum "docker/common/install_apex.sh" }}
+
+      - <<: *install_vissl_dep
+      - <<: *install_classy_vision
+      - <<: *install_fairscale
+      - <<: *install_apex_gpu
+      - <<: *pip_list
+
+      - run:
+          name: Check CUDA Available
+          command: python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'"
+
+      - save_cache:
+          paths:
+            - ~/vissl_venv
+          key: v9-gpu-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}-{{ checksum "docker/common/install_apex.sh" }}
+
+      - <<: *install_vissl
+
+      - run:
+          name: Run GPU tests
+          command: bash ./dev/run_quick_tests.sh
+
+# -------------------------------------------------------------------------------------
+# Workflows
+# -------------------------------------------------------------------------------------
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - cpu_tests
+      - gpu_tests

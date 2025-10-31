@@ -1,0 +1,25 @@
+# @package _global_
+config:
+  DATA:
+    TRAIN:
+      BATCHSIZE_PER_REPLICA: 64
+  MODEL:
+    TRUNK:
+      NAME: convnext
+      CONVNEXT:
+        DEPTH: [3, 3, 9, 3]
+        DIMS: [96, 192, 384, 768]
+        DROP_PATH_RATE: 0.0
+    HEAD:
+      PARAMS: [
+        ["dino_head", {
+          "in_dim": 768,
+          "num_clusters": [65536],
+          "normalize_last_layer": True,
+        }],
+      ]
+  DISTRIBUTED:
+    NUM_NODES: 2
+    NUM_PROC_PER_NODE: 8
+  SLURM:
+    CONSTRAINT: volta32gb
