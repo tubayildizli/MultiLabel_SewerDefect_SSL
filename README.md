@@ -26,7 +26,7 @@ See [`INSTALL.md`](./INSTALL.md).
 
 # Additional resources (weights & data)
 
-Model weights (SwAV pre-trained, fine-tuned supervised/semi-supervised) and supporting configs/data are available at
+Model weights (SwAV pre-trained, fine-tuned supervised/semi-supervised) and supporting configs/data are available at:
 
 https://doi.org/10.4121/1c21ce33-715f-4ca0-89fa-c170b30801ff.v2 
 
