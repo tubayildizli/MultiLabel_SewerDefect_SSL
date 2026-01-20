@@ -2,7 +2,7 @@
 
 This repository contains the code used for the following publication:
 ```bash
-Yildizi, T., Jia, T., Langeveld, J., & Taormina, R. (2026). Self-Supervised Learning Approach for Multi-label Sewer Defect Classification. Automation in Construction, ..
+Yildizi, T., Jia, T., Langeveld, J., & Taormina, R. (2026). Self-Supervised Learning for Multi-label Sewer Defect Classification. Automation in Construction, 182, 106751, ...
 ```
 This study explored the use of self-supervised learning for multi-label sewer defect classification. We proposed a semi-supervised framework that combines domain-specific pre-training on unlabelled CCTV footage with supervised fine-tuning on a limited labelled subset. This approach aims to reduce the dependence on extensive manual annotation while maintaining competitive performance across 17 sewer defect classes.
 
@@ -19,10 +19,35 @@ See [`INSTALL.md`](./INSTALL.md).
 
 ## Usage
 
--  Step 1: Pre-train models using a self-supervised learning method, i.e., SwAV, (see `main_Self_Supervised_Train_.ipynb`).
--  Step 2: Fine-tune the models obtained from Step 1 using in a supervised learning method for object detection (see `main_Fine_tune_for_object_detction.ipynb`).
--  Step 3: Evaluate model performnaces on test sets for object detection, e.g., AP50, and predicting images (see `main_Evaluate_Object_Detection.ipynb`).
--  Step 4: Output confusion matrix on test sets for object detection, e.g., TP, FP, and FN (see `main_Confusion_matrix_OD.ipynb`).
+### Quick Start
+
+1. **Install**: Follow [`INSTALL.md`](./INSTALL.md) for environment setup
+2. **Get Data**: Download Sewer-ML dataset from [https://vap.aau.dk/sewer-ml/](https://vap.aau.dk/sewer-ml/) and organize per [`data/README.md`](./data/README.md)
+3. **Download Weights** (optional): Pre-trained models at [https://doi.org/10.4121/1c21ce33-715f-4ca0-89fa-c170b30801ff.v2](https://doi.org/10.4121/1c21ce33-715f-4ca0-89fa-c170b30801ff.v2)
+
+### Training Pipeline
+
+**Step 1: Self-Supervised Pre-training**
+```bash
+jupyter notebook main_Self_Supervised_Train_.ipynb
+```
+Train ResNet-101 using SwAV on unlabeled sewer footage (104K-312K images).
+
+**Step 2: Fine-tuning on Labeled Data**
+```bash
+# With SSL pre-training (recommended)
+jupyter notebook fine_tuning/SSL_RN101_Finetuning_revision.ipynb
+
+# Or baseline (fully supervised)
+jupyter notebook fine_tuning/Fully_supervised_RN101_revision.ipynb
+```
+Fine-tune on 17 sewer defect classes with various annotation budgets (50-800 images/class).
+
+**Step 3: Evaluation**
+```bash
+jupyter notebook fine_tuning/Evaluate_model.ipynb
+```
+Evaluate models using mAP, precision, recall, and F1-scores on the test set
 
 # Additional resources (weights & data)
 
