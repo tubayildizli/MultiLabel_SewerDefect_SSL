@@ -34,16 +34,16 @@ Train ResNet-101 using SwAV on unlabeled sewer footage, see [main_Self_Supervise
 
 Fine-tune on 17 sewer defect classes with various annotation budgets.
 
-# With SSL pre-training (recommended)
-see [fine_tuning/SSL_RN101_Finetuning_revision.ipynb]`(fine_tuning/SSL_RN101_Finetuning_revision.ipynb)
+***With SSL pre-training (recommended)***
+see [fine_tuning/SSL_RN101_Finetuning_revision.ipynb]`(./fine_tuning/SSL_RN101_Finetuning_revision.ipynb)
 
-# Or baseline (fully supervised)
-see [fine_tuning/Fully_supervised_RN101_revision.ipynb]`(fine_tuning/Fully_supervised_RN101_revision.ipynb)
+***Or baseline (fully supervised)***
+see [fine_tuning/Fully_supervised_RN101_revision.ipynb]`(./fine_tuning/Fully_supervised_RN101_revision.ipynb)
 
 
 **Step 3: Evaluation**
 
-Evaluate models using mAP, precision, recall, and F1-scores on the test set, see [fine_tuning/Evaluate_model.ipynb]`(fine_tuning/Evaluate_model.ipynb)
+Evaluate models using mAP, precision, recall, and F1-scores on the test set, see [fine_tuning/Evaluate_model.ipynb]`(./fine_tuning/Evaluate_model.ipynb)
 
 # Additional resources (weights & data)
 
