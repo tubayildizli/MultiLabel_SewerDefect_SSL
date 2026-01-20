@@ -28,26 +28,22 @@ See [`INSTALL.md`](./INSTALL.md).
 ### Training Pipeline
 
 **Step 1: Self-Supervised Pre-training**
-```bash
-jupyter notebook main_Self_Supervised_Train_.ipynb
-```
-Train ResNet-101 using SwAV on unlabeled sewer footage (104K-312K images).
+Train ResNet-101 using SwAV on unlabeled sewer footage, see [main_Self_Supervised_Train_.ipynb]`(main_Self_Supervised_Train_.ipynb)
 
 **Step 2: Fine-tuning on Labeled Data**
-```bash
+
+Fine-tune on 17 sewer defect classes with various annotation budgets.
+
 # With SSL pre-training (recommended)
-jupyter notebook fine_tuning/SSL_RN101_Finetuning_revision.ipynb
+see [fine_tuning/SSL_RN101_Finetuning_revision.ipynb]`(fine_tuning/SSL_RN101_Finetuning_revision.ipynb)
 
 # Or baseline (fully supervised)
-jupyter notebook fine_tuning/Fully_supervised_RN101_revision.ipynb
-```
-Fine-tune on 17 sewer defect classes with various annotation budgets (50-800 images/class).
+see [fine_tuning/Fully_supervised_RN101_revision.ipynb]`(fine_tuning/Fully_supervised_RN101_revision.ipynb)
+
 
 **Step 3: Evaluation**
-```bash
-jupyter notebook fine_tuning/Evaluate_model.ipynb
-```
-Evaluate models using mAP, precision, recall, and F1-scores on the test set
+
+Evaluate models using mAP, precision, recall, and F1-scores on the test set, see [fine_tuning/Evaluate_model.ipynb]`(fine_tuning/Evaluate_model.ipynb)
 
 # Additional resources (weights & data)
 
