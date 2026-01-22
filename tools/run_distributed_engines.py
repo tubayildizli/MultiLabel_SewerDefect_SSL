@@ -21,7 +21,7 @@ import sys
 from typing import Any, List
 import datetime
 
-sys.path.append('/scratch/tyldzl/PythonProject/sewer_defects_vissl/')
+sys.path.append('${YOUR_PROJECT_ROOT}') # Add VISSL to path
 
 from vissl.utils.distributed_launcher import (
     launch_distributed,
@@ -37,9 +37,9 @@ from vissl.utils.slurm import is_submitit_available
 
 
 from vissl.data.dataset_catalog import VisslDatasetCatalog
-
-train_path="/scratch/tyldzl/data/Sewer_ML/pretrain/train"
-val_path="/scratch/tyldzl/data/Sewer_ML/pretrain/val"
+# Register your custom dataset here
+train_path="${YOUR_PROJECT_ROOT}/data/pretrain/train"
+val_path="${YOUR_PROJECT_ROOT}/data/pretrain/val"
 VisslDatasetCatalog.register_data(name="Sewer_ML", data_dict={"train": train_path, "val": val_path})
 # print("############# Registered my_dataset ###############")
 
