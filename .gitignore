@@ -121,3 +121,8 @@ checkpoints/
 
 # videos
 *.mp4
+
+# Custom .py files
+tools\run_distributed_engines_4k.py
+tools\run_distributed_engines_resized_100k.py
+tools\run_distributed_engines_wandb.py
